@@ -1,14 +1,15 @@
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { TransactionRow } from "./transaction-row"
-
-interface Transaction {
-  id: number
-  signature: string
-  status: "success" | "failed"
-}
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+import { TransactionRow } from "./transaction-row";
+import { Transaction } from "../lib/types";
 
 interface TransactionTableProps {
-  transactions: Transaction[]
+  transactions: Transaction[];
 }
 
 export function TransactionTable({ transactions }: TransactionTableProps) {
@@ -27,5 +28,5 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }
