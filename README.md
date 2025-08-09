@@ -15,8 +15,7 @@
 - [ ] Wire up with backend api
 
 ### API
-- [ ] Solana get current slot number
-- [ ] Solana get transaction by slot number
+- [x] Solana get transaction by slot number (/data/solana/:slot-number)
 
 ### Utils
 - [ ] LRU cache over API
