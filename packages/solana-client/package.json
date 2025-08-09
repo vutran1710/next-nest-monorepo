@@ -1,5 +1,5 @@
 {
-  "name": "solana-client",
+  "name": "@repo/solana-client",
   "version": "1.0.0",
   "description": "",
   "scripts": {
