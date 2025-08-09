@@ -16,16 +16,11 @@ export class SolanaCache {
   private ttl: number;
   private negTtl: number;
 
-  constructor(opts: SolanaCacheOptions = {}) {
-    const {
-      max = Number(process.env.SOLANA_CACHE_MAX ?? 500),
-      ttlMs = Number(process.env.SOLANA_CACHE_TTL_MS ?? 30_000),
-      negativeTtlMs = Number(process.env.SOLANA_CACHE_NEGATIVE_TTL_MS ?? 5_000),
-    } = opts;
-
+  constructor() {
+    const max = Number(process.env.SOLANA_CACHE_MAX ?? 500);
+    this.ttl = Number(process.env.SOLANA_CACHE_TTL_MS ?? 30_000);
+    this.negTtl = Number(process.env.SOLANA_CACHE_NEGATIVE_TTL_MS ?? 5_000);
     this.cache = new LRUCache<string, CachedValue>({ max });
-    this.ttl = ttlMs;
-    this.negTtl = negativeTtlMs;
   }
 
   private key(slot: number) {
