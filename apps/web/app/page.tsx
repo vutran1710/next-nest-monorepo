@@ -1,103 +1,150 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import type React from "react"
+import { useState } from "react"
+import { Container } from "@/components/container"
+import { Header } from "@/components/header"
+import { Footer } from "@/components/footer"
+import { SearchTitle } from "@/components/search-title"
+import { SlotSearch } from "@/components/slot-search"
+import { SlotInformation } from "@/components/slot-information"
+import { TransactionList } from "@/components/transaction-list"
+import { SlotNotFound } from "@/components/slot-not-found"
+import { EmptyState } from "@/components/empty-state"
+
+// Mock data generator for Solana transactions
+const generateMockTransactions = (slotNumber: string, count = 100) => {
+  const transactions = []
+  for (let i = 0; i < count; i++) {
+    const signature = Array.from(
+      { length: 88 },
+      () => "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"[Math.floor(Math.random() * 58)],
+    ).join("")
+
+    transactions.push({
+      id: i + 1,
+      signature,
+      status: Math.random() > 0.15 ? "success" : "failed", // 85% success rate
+    })
+  }
+  return transactions
+}
+
+const generateSlotInfo = (slotNumber: string) => {
+  const totalTransactions = Math.floor(Math.random() * 200) + 50
+  const successRate = 0.85
+  const totalSuccess = Math.floor(totalTransactions * successRate)
+  const totalFail = totalTransactions - totalSuccess
+
+  return {
+    slotNumber,
+    totalTransactions,
+    totalSuccess,
+    totalFail,
+  }
+}
+
+export default function SolanaTransactionLookup() {
+  const [slotNumber, setSlotNumber] = useState("")
+  const [searchedSlot, setSearchedSlot] = useState("")
+  const [transactions, setTransactions] = useState<any[]>([])
+  const [slotInfo, setSlotInfo] = useState<any>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const [slotNotFound, setSlotNotFound] = useState(false)
+
+  const transactionsPerPage = 20
+  const totalPages = Math.ceil(transactions.length / transactionsPerPage)
+  const startIndex = (currentPage - 1) * transactionsPerPage
+  const endIndex = startIndex + transactionsPerPage
+  const currentTransactions = transactions.slice(startIndex, endIndex)
+
+  const handleSearch = async () => {
+    if (!slotNumber.trim()) return
+
+    setIsLoading(true)
+    setCurrentPage(1)
+    setSlotNotFound(false)
+
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // Simulate slot not found (10% chance or for specific test cases)
+    const shouldNotFind = Math.random() < 0.1 || slotNumber === "0" || slotNumber === "999999999"
+
+    if (shouldNotFind) {
+      setSlotNotFound(true)
+      setTransactions([])
+      setSlotInfo(null)
+      setSearchedSlot(slotNumber)
+    } else {
+      const mockTransactions = generateMockTransactions(slotNumber)
+      const mockSlotInfo = generateSlotInfo(slotNumber)
+
+      setTransactions(mockTransactions)
+      setSlotInfo(mockSlotInfo)
+      setSearchedSlot(slotNumber)
+      setSlotNotFound(false)
+    }
+
+    setIsLoading(false)
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch()
+    }
+  }
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1))
+  }
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <Container>
+      <Header />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <SearchTitle />
+
+        <SlotSearch
+          slotNumber={slotNumber}
+          isLoading={isLoading}
+          onSlotNumberChange={setSlotNumber}
+          onSearch={handleSearch}
+          onKeyPress={handleKeyPress}
+        />
+
+        {/* Results */}
+        {slotInfo && (
+          <div className="space-y-6">
+            <SlotInformation slotInfo={slotInfo} searchedSlot={searchedSlot} />
+
+            <TransactionList
+              transactions={currentTransactions}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+          </div>
+        )}
+
+        {/* Empty State and Not Found */}
+        {!slotInfo && !isLoading && (
+          <div className="text-center py-12">
+            {slotNotFound ? <SlotNotFound searchedSlot={searchedSlot} /> : <EmptyState />}
+          </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+
+      <Footer />
+    </Container>
+  )
 }
