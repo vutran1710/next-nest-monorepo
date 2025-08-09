@@ -34,6 +34,16 @@ export default function SolanaTransactionLookup() {
   const handleSearch = async () => {
     if (!slotNumber.trim()) return;
 
+    const parsedSlotNumber = Number(slotNumber);
+    if (isNaN(parsedSlotNumber) || parsedSlotNumber <= 0) {
+      setSlotNotFoundError(
+        "Invalid slot number. Please enter a valid positive integer.",
+      );
+      setTransactions([]);
+      setSlotInfo(null);
+      return;
+    }
+
     setIsLoading(true);
     setCurrentPage(1);
     setSlotNotFoundError(null);
@@ -62,6 +72,11 @@ export default function SolanaTransactionLookup() {
   const handleNextPage = () =>
     setCurrentPage((p) => Math.min(p + 1, totalPages));
 
+  const handleSearchChange = (value: string) => {
+    setSlotNumber(value.trim());
+    setSlotNotFoundError(null);
+  };
+
   return (
     <Container>
       <Header />
@@ -72,9 +87,9 @@ export default function SolanaTransactionLookup() {
         <SlotSearch
           slotNumber={slotNumber}
           isLoading={isLoading}
-          onSlotNumberChange={setSlotNumber}
-          onSearch={handleSearch}
-          onKeyPress={handleKeyPress}
+          onSlotNumberChangeAction={handleSearchChange}
+          onSearchAction={handleSearch}
+          onKeyPressAction={handleKeyPress}
         />
 
         {slotInfo && (
