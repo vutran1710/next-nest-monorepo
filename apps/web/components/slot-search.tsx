@@ -1,19 +1,25 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import type React from "react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Search } from "lucide-react";
 
 interface SlotSearchProps {
-  slotNumber: string
-  isLoading: boolean
-  onSlotNumberChange: (value: string) => void
-  onSearch: () => void
-  onKeyPress: (e: React.KeyboardEvent) => void
+  slotNumber: string;
+  isLoading: boolean;
+  onSlotNumberChange: (value: string) => void;
+  onSearch: () => void;
+  onKeyPress: (e: React.KeyboardEvent) => void;
 }
 
-export function SlotSearch({ slotNumber, isLoading, onSlotNumberChange, onSearch, onKeyPress }: SlotSearchProps) {
+export function SlotSearch({
+  slotNumber,
+  isLoading,
+  onSlotNumberChange,
+  onSearch,
+  onKeyPress,
+}: SlotSearchProps) {
   return (
     <div className="max-w-md mx-auto mb-8">
       <div className="flex space-x-2">
@@ -31,5 +37,5 @@ export function SlotSearch({ slotNumber, isLoading, onSlotNumberChange, onSearch
         </Button>
       </div>
     </div>
-  )
+  );
 }
