@@ -15,21 +15,23 @@ import { Transaction } from "../lib/types";
 interface TransactionListProps {
   transactions: Transaction[];
   currentPage: number;
+  perPage: number;
   totalPages: number;
   startIndex: number;
   endIndex: number;
-  onPreviousPage: () => void;
-  onNextPage: () => void;
+  onPreviousPageAction: () => void;
+  onNextPageAction: () => void;
 }
 
 export function TransactionList({
   transactions,
   currentPage,
+  perPage,
   totalPages,
   startIndex,
   endIndex,
-  onPreviousPage,
-  onNextPage,
+  onPreviousPageAction,
+  onNextPageAction,
 }: TransactionListProps) {
   return (
     <Card>
@@ -41,7 +43,10 @@ export function TransactionList({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <TransactionTable transactions={transactions} />
+        <TransactionTable
+          transactions={transactions}
+          page={(currentPage - 1) * perPage}
+        />
 
         {/* Pagination */}
         {totalPages > 1 && (
@@ -53,7 +58,7 @@ export function TransactionList({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={onPreviousPage}
+                onClick={onPreviousPageAction}
                 disabled={currentPage === 1}
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
@@ -62,7 +67,7 @@ export function TransactionList({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={onNextPage}
+                onClick={onNextPageAction}
                 disabled={currentPage === totalPages}
               >
                 Next

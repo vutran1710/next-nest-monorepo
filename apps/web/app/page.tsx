@@ -11,57 +11,19 @@ import { SlotInformation } from "../components/slot-information";
 import { TransactionList } from "../components/transaction-list";
 import { SlotNotFound } from "../components/slot-not-found";
 import { EmptyState } from "../components/empty-state";
-import { SlotInfo, Transaction } from "../lib/types";
-
-// Mock data generator for Solana transactions
-const generateMockTransactions = (
-  slotNumber: number,
-  count = 100,
-): Transaction[] => {
-  const transactions: Transaction[] = [];
-  for (let i = 0; i < count; i++) {
-    const signature = Array.from(
-      { length: 88 },
-      () =>
-        "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"[
-          Math.floor(Math.random() * 58)
-        ],
-    ).join("");
-
-    transactions.push({
-      id: i + 1,
-      signature,
-      status: Math.random() > 0.15 ? "success" : "fail", // 85% success rate
-      slot: slotNumber,
-      blockTime: new Date().getTime(),
-      fee: 0.5,
-    });
-  }
-  return transactions;
-};
-
-const generateSlotInfo = (slotNumber: number): SlotInfo => {
-  const totalTransactions = Math.floor(Math.random() * 200) + 50;
-  const successRate = 0.85;
-  const totalSuccess = Math.floor(totalTransactions * successRate);
-  const totalFail = totalTransactions - totalSuccess;
-
-  return {
-    slotNumber,
-    totalTransactions,
-    totalSuccess,
-    totalFail,
-  };
-};
+import { api } from "../lib/api-service";
+import { Transaction, SlotData } from "../lib/types";
 
 export default function SolanaTransactionLookup() {
   const [slotNumber, setSlotNumber] = useState("");
   const [searchedSlot, setSearchedSlot] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [slotInfo, setSlotInfo] = useState<SlotInfo | null>(null);
+  const [slotInfo, setSlotInfo] = useState<SlotData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [slotNotFound, setSlotNotFound] = useState(false);
+  const [slotNotFoundError, setSlotNotFoundError] = useState<string | null>(
+    null,
+  );
 
   const transactionsPerPage = 20;
   const totalPages = Math.ceil(transactions.length / transactionsPerPage);
@@ -74,46 +36,31 @@ export default function SolanaTransactionLookup() {
 
     setIsLoading(true);
     setCurrentPage(1);
-    setSlotNotFound(false);
+    setSlotNotFoundError(null);
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Simulate slot not found (10% chance or for specific test cases)
-    const shouldNotFind =
-      Math.random() < 0.1 || slotNumber === "0" || slotNumber === "999999999";
-
-    if (shouldNotFind) {
-      setSlotNotFound(true);
+    try {
+      const data = await api.getSolanaData(Number(slotNumber));
+      setTransactions(data.transactions);
+      setSlotInfo(data);
+      setSearchedSlot(slotNumber);
+      setSlotNotFoundError(null);
+    } catch (e: unknown) {
+      setSlotNotFoundError(e instanceof Error ? e.message : "Unknown error");
       setTransactions([]);
       setSlotInfo(null);
       setSearchedSlot(slotNumber);
-    } else {
-      const mockTransactions = generateMockTransactions(Number(slotNumber));
-      const mockSlotInfo = generateSlotInfo(Number(slotNumber));
-
-      setTransactions(mockTransactions);
-      setSlotInfo(mockSlotInfo);
-      setSearchedSlot(slotNumber);
-      setSlotNotFound(false);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+    if (e.key === "Enter") handleSearch();
   };
 
-  const handlePreviousPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
+  const handlePreviousPage = () => setCurrentPage((p) => Math.max(p - 1, 1));
+  const handleNextPage = () =>
+    setCurrentPage((p) => Math.min(p + 1, totalPages));
 
   return (
     <Container>
@@ -130,7 +77,6 @@ export default function SolanaTransactionLookup() {
           onKeyPress={handleKeyPress}
         />
 
-        {/* Results */}
         {slotInfo && (
           <div className="space-y-6">
             <SlotInformation slotInfo={slotInfo} searchedSlot={searchedSlot} />
@@ -141,17 +87,20 @@ export default function SolanaTransactionLookup() {
               totalPages={totalPages}
               startIndex={startIndex}
               endIndex={endIndex}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
+              onPreviousPageAction={handlePreviousPage}
+              onNextPageAction={handleNextPage}
+              perPage={transactionsPerPage}
             />
           </div>
         )}
 
-        {/* Empty State and Not Found */}
         {!slotInfo && !isLoading && (
           <div className="text-center py-12">
-            {slotNotFound ? (
-              <SlotNotFound searchedSlot={searchedSlot} />
+            {slotNotFoundError ? (
+              <SlotNotFound
+                searchedSlot={searchedSlot}
+                message={slotNotFoundError}
+              />
             ) : (
               <EmptyState />
             )}

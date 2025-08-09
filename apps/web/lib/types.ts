@@ -1,16 +1,16 @@
 export interface Transaction {
-  id: number;
   signature: string;
-  slot: number;
-  blockTime: number;
   status: "success" | "fail";
+  timestamp: number;
   fee: number;
-  memo?: string;
 }
 
-export interface SlotInfo {
-  slotNumber: number;
-  totalTransactions: number;
+export interface SlotData {
+  totalTransaction: number;
   totalSuccess: number;
   totalFail: number;
+  blockTime: number | null;
+  blockNumber: number;
+  blockHash: string;
+  transactions: Transaction[];
 }

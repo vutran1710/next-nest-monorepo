@@ -10,9 +10,13 @@ import { Transaction } from "../lib/types";
 
 interface TransactionTableProps {
   transactions: Transaction[];
+  page: number;
 }
 
-export function TransactionTable({ transactions }: TransactionTableProps) {
+export function TransactionTable({
+  transactions,
+  page,
+}: TransactionTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -23,8 +27,12 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {transactions.map((transaction) => (
-          <TransactionRow key={transaction.id} transaction={transaction} />
+        {transactions.map((transaction, index) => (
+          <TransactionRow
+            key={transaction.signature}
+            index={index + page + 1}
+            transaction={transaction}
+          />
         ))}
       </TableBody>
     </Table>

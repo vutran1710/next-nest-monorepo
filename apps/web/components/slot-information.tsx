@@ -5,10 +5,10 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { SlotInfo } from "../lib/types";
+import { SlotData } from "../lib/types";
 
 interface SlotInformationProps {
-  slotInfo: SlotInfo;
+  slotInfo: SlotData;
   searchedSlot: string;
 }
 
@@ -28,13 +28,13 @@ export function SlotInformation({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">
-              {slotInfo.slotNumber}
+              {slotInfo.blockNumber}
             </div>
             <div className="text-sm text-muted-foreground">Slot Number</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold">
-              {slotInfo.totalTransactions}
+              {slotInfo.totalTransaction}
             </div>
             <div className="text-sm text-muted-foreground">
               Total Transactions

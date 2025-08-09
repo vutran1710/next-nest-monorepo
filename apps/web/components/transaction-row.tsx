@@ -4,14 +4,15 @@ import { Transaction } from "../lib/types";
 
 interface TransactionRowProps {
   transaction: Transaction;
+  index: number;
 }
 
-export function TransactionRow({ transaction }: TransactionRowProps) {
+export function TransactionRow({ transaction, index }: TransactionRowProps) {
   return (
     <TableRow>
-      <TableCell className="font-medium">{transaction.id}</TableCell>
+      <TableCell className="font-medium">{index}</TableCell>
       <TableCell className="font-mono text-sm">
-        <span className="inline-block max-w-xs truncate">
+        <span className="inline-block max-w-xl truncate">
           {transaction.signature}
         </span>
       </TableCell>
