@@ -38,18 +38,19 @@
 ### Install dependencies
 ```bash
 pnpm install
+pnpm run build
 ````
 
 ### Run the app
 
 ```bash
 cd apps/web
-pnpm run dev
+PORT=3000 pnpm run dev
 ```
 
 ### Run the API
 
 ```bash
 cd apps/api
-pnpm run start:dev
+SOLANA_RPC_URL=[...rpc-here] PORT=3001 pnpm run start:dev
 ```
