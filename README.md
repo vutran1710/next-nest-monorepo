@@ -1,5 +1,10 @@
 # NestJs + NextJs + Turborepo
 
+
+<p align="center">
+  <img src="./ss.png" alt="App Screenshot" width="800" />
+</p>
+
 ## TODO
 
 ### Web
@@ -33,15 +38,17 @@
 ### Install dependencies
 ```bash
 pnpm install
-```
+````
 
 ### Run the app
+
 ```bash
 cd apps/web
 pnpm run dev
 ```
 
 ### Run the API
+
 ```bash
 cd apps/api
 pnpm run start:dev
