@@ -12,7 +12,7 @@
 - [x] Solana transaction list
 - [x] Solana transaction item
 - [x] Solana transaction details
-- [ ] Wire up with backend api
+- [x] Wire up with backend api
 
 ### API
 - [x] Solana get transaction by slot number (/data/solana/:slot-number)
