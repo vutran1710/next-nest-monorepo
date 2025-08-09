@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { SolanaService } from './solana.service';
 import { SolanaController } from './solana.controller';
 import { SolanaClient } from '@repo/solana-client';
+import { SolanaCache } from './solana.cache';
 
 @Module({
   controllers: [SolanaController],
   providers: [
     SolanaService,
+    SolanaCache,
     {
       provide: SolanaClient,
       useFactory: () =>
