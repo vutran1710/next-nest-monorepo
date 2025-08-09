@@ -22,4 +22,4 @@
 - [ ] LRU cache over API
 
 ### Packages
-- [ ] Solana API client
+- [x] Solana API client
